@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
-
-type Memo = { id: string; text: string }
+import { MemoItem } from './components/MemoItem'
+import type { Memo } from './memo'
 
 const STORAGE_KEY = 'memos'
 
 function loadMemos(): Memo[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as Memo[]) : []
+    if (!raw) return []
+    const parsed = JSON.parse(raw) as (Omit<Memo, 'tags'> & { tags?: string[] })[]
+    return parsed.map((m) => ({ ...m, tags: m.tags ?? [] }))
   } catch {
     return []
   }
@@ -21,20 +23,23 @@ export default function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(memos))
   }, [memos])
 
-  const addMemo = (e: React.FormEvent) => {
+  const handleAddMemo = (e: React.FormEvent) => {
     e.preventDefault()
     const trimmed = text.trim()
     if (!trimmed) return
-    setMemos([{ id: crypto.randomUUID(), text: trimmed }, ...memos])
+    setMemos([{ id: crypto.randomUUID(), text: trimmed, tags: [] }, ...memos])
     setText('')
   }
 
-  const deleteMemo = (id: string) => setMemos(memos.filter((m) => m.id !== id))
+  const handleDeleteMemo = (id: string) => setMemos(memos.filter((m) => m.id !== id))
+
+  const handleChangeTags = (id: string, change: (tags: string[]) => string[]) =>
+    setMemos(memos.map((m) => (m.id === id ? { ...m, tags: change(m.tags) } : m)))
 
   return (
     <div className="mx-auto max-w-md p-6">
       <h1 className="mb-4 text-2xl font-bold">메모앱</h1>
-      <form onSubmit={addMemo} className="mb-4 flex gap-2">
+      <form onSubmit={handleAddMemo} className="mb-4 flex gap-2">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -51,18 +56,16 @@ export default function App() {
       ) : (
         <ul className="space-y-2">
           {memos.map((m) => (
-            <li
+            <MemoItem
               key={m.id}
-              className="flex items-center justify-between rounded border border-gray-200 px-3 py-2"
-            >
-              <span className="break-all">{m.text}</span>
-              <button
-                onClick={() => deleteMemo(m.id)}
-                className="ml-2 text-sm text-red-600 hover:underline"
-              >
-                삭제
-              </button>
-            </li>
+              text={m.text}
+              tags={m.tags}
+              onDelete={() => handleDeleteMemo(m.id)}
+              onAddTag={(tag) => handleChangeTags(m.id, (tags) => [...tags, tag])}
+              onRemoveTag={(tag) =>
+                handleChangeTags(m.id, (tags) => tags.filter((t) => t !== tag))
+              }
+            />
           ))}
         </ul>
       )}
