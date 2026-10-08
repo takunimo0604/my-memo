@@ -14,7 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Small memo app: React 19 + TypeScript + Vite 8, styled with Tailwind v4 (via the `@tailwindcss/vite` plugin, no tailwind config file).
 
 - All state lives in `App` (`src/App.tsx`): the memo list is held in `useState`, initialised from and synced to `localStorage` under the key `memos` (`loadMemos` falls back to `[]` on parse errors). Child components in `src/components/` are presentational and receive data/callbacks via props.
-- Tests run in jsdom with Testing Library; `vite.config.ts` holds the Vitest config and loads `src/test/setup.ts` (jest-dom matchers only).
+- Tests run in jsdom with Testing Library; `vite.config.ts` holds the Vitest config and loads `src/test/setup.ts` (jest-dom matchers and Testing Library `cleanup` after each test, since vitest globals are off).
 - UI text is in Korean.
 
 ## 코딩 규칙
