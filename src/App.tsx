@@ -45,6 +45,7 @@ export default function App() {
           추가
         </button>
       </form>
+      <p className="mb-2 text-sm text-gray-600">전체 {memos.length}개</p>
       {memos.length === 0 ? (
         <p className="text-gray-500">메모가 없습니다.</p>
       ) : (
