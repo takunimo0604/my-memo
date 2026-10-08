@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>아키텍처 import 관계도</title>
+</head>
+<body>
+  <h1>아키텍처 import 관계도</h1>
+  <pre class="mermaid">
+flowchart TD
+  subgraph 컴포넌트
+    main["main.tsx"]
+    App["App.tsx"]
+    MemoItem["components/MemoItem.tsx"]
+    Hello["components/Hello.tsx"]
+  end
+  main --> App
+  </pre>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</body>
+</html>
